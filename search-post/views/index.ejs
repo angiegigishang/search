@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <script src="/javascripts/jquery.min.js"></script>
+  </head>
+  <body>
+	<div class="bg-div">
+		<div class="search-box">
+
+			<div class="logo"></div>
+
+			<form class="search-form" action="https://cn.bing.com/search" target="_blank" id="search-form">
+				<input type="text" class="search-input-text" name="q" id="search_input" autocomplete="off"/>
+				<input type="submit" class="search-input-button" value=""/>
+			</form>
+
+			<div class="suggest" id="search-suggest" style="display: none">
+				<ul id="search-result">
+					<li>search 1</li>
+					<li>search 2</li>
+				</ul>
+			</div>
+
+		</div>
+	</div>
+
+	<script>
+		$(function(){
+			$('#search_input').bind('keyup', function(){
+				var searchText = $('#search_input').val();
+				var url = './search';
+
+				$.ajax({
+					type:'post',
+					url: url,
+					data: {
+							q: searchText
+				          },
+					
+					dataType: 'json',
+					success: function(d){
+								var d = d.AS.Results[0].Suggests;
+								var html='';
+								for(var i=0; i<d.length; i++){
+									html += '<li>' + d[i].Txt + '</li>';
+								}
+								$('#search-result').html(html);
+								$('#search-suggest').show().css({
+																top: 39,
+																left: 125,
+																position: 'absolute'
+					        							    })
+							}
+					})
+			})
+
+			$(document).bind('click', function() {
+				$('#search-suggest').hide();
+			});
+
+			$(document).delegate('li', 'click', function() {
+				var keyword = $(this).text();
+				location.href = 'http://cn.bing.com/search?q=' + keyword;
+			});
+		})
+
+				
+	</script>
+
+</body>
+</html>

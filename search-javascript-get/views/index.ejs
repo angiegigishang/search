@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <script src="/javascripts/jquery.min.js"></script>
+  </head>
+  <body>
+	<div class="bg-div">
+		<div class="search-box">
+
+			<div class="logo"></div>
+
+			<form class="search-form" action="https://cn.bing.com/search" target="_blank" id="search-form">
+				<input type="text" class="search-input-text" name="q" id="search_input" autocomplete="off"/>
+				<input type="submit" class="search-input-button" value=""/>
+			</form>
+
+			<div class="suggest" id="search-suggest" style="display: none">
+				<ul id="search-result">
+					<li>search 1</li>
+					<li>search 2</li>
+				</ul>
+			</div>
+
+		</div>
+	</div>
+
+	<script>
+
+		var getDOM = function(id) {
+			return document.getElementById(id);
+		}
+
+		var addEvent = function(id, event, fn) {
+			var el = getDOM(id) || document;
+			if(el.addEventListener) {
+				el.addEventListener(event, fn, false);
+			}else if(el.attachEvent) {
+				el.attachEvent('on' + event, fn);
+			}
+		}
+
+		/*var getElementLeft = function(element) {
+			var actualLeft = element.offsetLeft;
+			var current = element.offsetParent;
+
+			while(current !== null) {
+				actualLeft += current.offsetLeft;
+				current = current.offsetParent;
+			}
+			return actualLeft;
+		}*/
+
+		/*var getElementTop = function(element) {
+			var actualTop = element.offsetTop;
+			var current = element.offsetParent;
+
+			while(current != null) {
+				actualTop += current.offsetTop;
+				current = current.offsetParent;
+			}
+			return actualTop;
+		}*/
+
+		var ajaxGet = function(url,callback) {
+			var _xhr = null;
+			if(window.XMLHttpRequest) {
+				_xhr = new window.XMLHttpRequest();
+			}else if(window.ActiveXObject) {
+				_xhr = new ActiveXObject('Msxml2.XMLHTTP');
+			}
+
+			_xhr.onreadystatechange = function() {
+				if(_xhr.readyState == 4 && _xhr.status == 200) {
+					callback(JSON.parse(_xhr.responseText));
+				}
+			}
+
+			_xhr.open('get', url, true);
+			_xhr.send(null);
+
+		}
+
+		var delegateEvent = function(target, event, fn) {
+			addEvent(document, event, function(e){
+				if(e.target.nodeName == target.toUpperCase()) {
+					fn.call(e.target);
+				}
+			});
+		}
+
+
+		addEvent('search_input', 'keyup', function(){
+			var searchText = getDOM('search_input').value;
+			ajaxGet('./search?q=' + searchText, function(d){
+				var d = d.AS.Results[0].Suggests;
+				var html = '';
+				for(var i=0; i<d.length; i++){
+					html += '<li>' + d[i].Txt + '</li>';
+				}
+			
+			getDOM('search-result').innerHTML = html;
+			//getDOM('search-suggest').style.top = getElementTop(getDOM('search-form')) + 38 + 'px';
+			//getDOM('search-suggest').style.left = getElementLeft(getDOM('search-form')) + 'px';
+			getDOM('search-suggest').style.position = 'absolute';
+			getDOM('search-suggest').style.display = 'block';
+		});
+			});
+
+		addEvent('bg-div', 'click', function(){
+			var searchS = getDOM('search-suggest');
+			searchS.style.display= "none";
+
+
+		})
+
+		delegateEvent('li', 'click', function() {
+			var keyword = this.innerHTML;
+			location.href = "http://cn.bing.com/search?q=" + keyword;
+		});
+
+
+		/*$(function(){
+			$('#search_input').bind('keyup', function(){
+				var searchText = $('#search_input').val();
+				var url = '/search?q=' + searchText;
+
+				$.ajax({
+					type:'get',
+					url: url,
+					cache: true,
+					dataType: 'json',
+					success: function(d){
+								var d = d.AS.Results[0].Suggests;
+								var html='';
+								for(var i=0; i<d.length; i++){
+									html += '<li>' + d[i].Txt + '</li>';
+								}
+								$('#search-result').html(html);
+								$('#search-suggest').show().css({
+																top: 39,
+																left: 125,
+																position: 'absolute'
+					        							    })
+							}
+						})
+			})
+
+			$(document).bind('click', function() {
+				$('#search-suggest').hide();
+			});
+
+			$(document).delegate('li', 'click', function() {
+				var keyword = $(this).text();
+				location.href = 'http://cn.bing.com/search?q=' + keyword;
+			});
+		})*/
+
+				/*	success: function(res, status, xhr) {
+    					var ress = eval("("+res+")");
+    					if(ress.status == 200) {
+    						render(ress.data);
+    					}else{
+    						alert('error');
+    					}
+    				},
+    				error: function() {
+    					alert('error');
+    				}
+
+			    })
+
+		    });
+
+		    function render(data) {
+		    	var d = data.AS.Results[0].Suggests;
+								var html='';
+								for(var i=0; i<d.length; i++){
+									html += '<li>' + d[i].Txt + '</li>';
+								}
+								$('#search-result').html(html);
+								$('#search-suggest').show().css({
+																top: 39,
+																left: 125,
+																position: 'absolute'
+					        							    })
+
+		    }*/
+
+
+
+	/*	$('#search_input').bind('keyup', function() {
+			
+			var searchText = $('#search_input').val();
+			$.get('http://api.bing.com/qsonhs.aspx?q=' + searchText, function(d){
+				var d = d.AS.Results[0].Suggests;
+				var html='';
+				for(var i=0; i<d.length; i++){
+					html += '<li>' + d[i].Txt + '</li>';
+				}
+				$('#search-result').html(html);
+				$('#search-suggest').show().css({
+				top: 39,
+				left: 125,
+				position: 'absolute'
+			});
+			}, 'json');		
+		})*/
+	</script>
+
+</body>
+</html>
