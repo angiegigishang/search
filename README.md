@@ -11,5 +11,5 @@ express, ajax, jquery, javascript
 修改代码后
 
 
-在express环境中，实现了jQuery ajax进行get post请求，javascript get请求三个练习
+在express环境中，实现了jQuery ajax分别进行get、post请求，javascript ajax get请求三个练习
 
